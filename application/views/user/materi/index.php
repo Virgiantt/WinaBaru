@@ -29,7 +29,7 @@
                 $.each(data, function(index, item) {
                     cardData += `<div class="col-md-4 col-sm-6">
                         <a href="<?= base_url('pembahasan/index') ?>/${item.chapter_id}" class="text-decoration-none">
-                            <div class="bg-primary p-4 my-3 text-white rounded shadow" style="min-height: 160px;">
+                            <div class="bg-warning p-4 my-3 text-white rounded shadow" style="min-height: 160px;">
                                 <h3>${item.chapter_name}</h3>
                                 <p>${item.desc}</p>
                                 <small class="text-light">Modul: ${item.modul_name}</small>

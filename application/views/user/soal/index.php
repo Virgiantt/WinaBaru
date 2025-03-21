@@ -22,15 +22,41 @@ $chapter_id = isset($chapter_id) ? $chapter_id : 1;
 
                     <div class="answer-selection mt-3">
                         <label>Pilih Jawaban:</label>
-                        <?php foreach (['A', 'B', 'C', 'D', 'E'] as $label) : ?>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="jawaban_<?= $index; ?>" value="<?= $label; ?>">
-                                <label class="form-check-label"><?= $label; ?></label>
-                            </div>
-                        <?php endforeach; ?>
+                        <?php
+                        $options = [
+                            'A' => $question->opt_1,
+                            'B' => $question->opt_2,
+                            'C' => $question->opt_3,
+                            'D' => $question->opt_4,
+                            'E' => $question->opt_5
+                        ];
+
+                        $answers = [
+                            'A' => $question->ans_1,
+                            'B' => $question->ans_2,
+                            'C' => $question->ans_3,
+                            'D' => $question->ans_4,
+                            'E' => $question->ans_5
+                        ];
+
+                        foreach ($options as $label => $option) :
+                            if (!empty($option)) :
+                        ?>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" id="jawaban_<?= $index; ?>_<?= $label; ?>"
+                                        name="jawaban_<?= $index; ?>" value="<?= $label; ?>">
+                                    <label class="form-check-label" for="jawaban_<?= $index; ?>_<?= $label; ?>">
+                                        <?= $label . ". " . $answers[$label]; ?>
+                                    </label>
+                                </div>
+                        <?php
+                            endif;
+                        endforeach;
+                        ?>
                     </div>
                 </div>
             <?php endforeach; ?>
+
 
             <!-- Navigasi Soal -->
             <div class="d-flex justify-content-between mt-3">
@@ -56,7 +82,7 @@ $chapter_id = isset($chapter_id) ? $chapter_id : 1;
                 </div>
                 <div class="mt-3 d-flex justify-content-between">
                     <button class="btn btn-danger w-50" onclick="confirmCancel()">Batalkan</button>
-                    <button class="btn btn-success w-50 ms-2">Selesai</button>
+                    <button class="btn btn-success w-50 ms-2" onclick="submitQuiz()">Selesai</button>
                 </div>
 
             </div>
@@ -114,13 +140,114 @@ $chapter_id = isset($chapter_id) ? $chapter_id : 1;
     }
 
     function confirmCancel() {
-        if (confirm("Apakah Anda yakin ingin membatalkan ujian ini? Semua jawaban akan hilang.")) {
-            window.location.href = "<?= base_url('pembahasan/index/' . $chapter_id) ?>";
-        }
+        Swal.fire({
+            title: "Yakin ingin membatalkan?",
+            text: "Semua jawaban akan hilang dan Anda tidak bisa mengulang!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Ya, Batalkan!",
+            cancelButtonText: "Tidak"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "<?= base_url('pembahasan/index/' . $chapter_id) ?>";
+            }
+        });
     }
 
-    // Timer hitung mundur
-    let timeLeft = 901; // 15 menit 1 detik dalam detik
+    function submitQuiz() {
+        Swal.fire({
+            title: "Yakin sudah selesai?",
+            text: "Pastikan semua jawaban sudah benar sebelum mengirim!",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonColor: "#28a745",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Ya, Selesai!",
+            cancelButtonText: "Cek Lagi"
+        }).then((result) => {
+            if (!result.isConfirmed) return;
+
+            let userId = <?= $this->session->userdata('user_id'); ?>;
+            let discussId = <?= json_encode($this->session->userdata('discuss_id')); ?>;
+            let quizData = [];
+
+            let questions = <?= json_encode($questions); ?>;
+
+            let questionContainers = document.querySelectorAll(".question-container");
+
+            for (let i = 0; i < questionContainers.length; i++) {
+                let selectedOption = questionContainers[i].querySelector('input[name="jawaban_' + i + '"]:checked');
+
+                if (selectedOption) {
+                    let questionId = questions[i].id;
+                    let ansOpt = selectedOption.value;
+                    let ansVal = selectedOption.nextElementSibling.textContent.trim();
+
+                    quizData.push({
+                        question_id: questionId,
+                        answer: ansOpt
+                    });
+
+                    console.log("Pertanyaan ke-" + (i + 1) + ": " + ansOpt + " (" + ansVal + ")");
+                } else {
+                    console.log("Pertanyaan ke-" + (i + 1) + ": Belum dijawab");
+                }
+            }
+
+            console.log("Quiz Data:", quizData);
+            if (quizData.length === 0) {
+                Swal.fire({
+                    title: "Oops!",
+                    text: "Anda belum menjawab pertanyaan apa pun!",
+                    icon: "error"
+                });
+                return;
+            }
+
+
+            fetch("<?= base_url('Soal/submit_quiz'); ?>", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        discuss_id: discussId,
+                        answers: quizData
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "success") {
+                        Swal.fire({
+                            title: "Selesai!",
+                            text: "Latihan telah dikumpulkan dengan sukses!",
+                            icon: "success",
+                            confirmButtonColor: "#3085d6"
+                        }).then(() => {
+                            window.location.href = "<?= base_url('pembahasan/index/' . $chapter_id) ?>";
+                        });
+                    } else {
+                        Swal.fire({
+                            title: "Gagal!",
+                            text: data.message,
+                            icon: "error"
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error("Error submitting quiz:", error);
+                    Swal.fire({
+                        title: "Error!",
+                        text: "Terjadi kesalahan saat mengirim jawaban!",
+                        icon: "error"
+                    });
+                });
+        });
+    }
+
+    let timeLeft = 901;
     const timerElement = document.getElementById("timer");
 
     function updateTimer() {
@@ -133,6 +260,7 @@ $chapter_id = isset($chapter_id) ? $chapter_id : 1;
             setTimeout(updateTimer, 1000);
         } else {
             alert("Waktu habis! Jawaban akan dikumpulkan.");
+            submitQuiz();
         }
     }
 
