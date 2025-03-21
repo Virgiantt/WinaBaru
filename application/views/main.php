@@ -49,7 +49,7 @@
             <a href="<?= base_url("user/kelas/index") ?>" class="text-decoration-none">
                <div class="bg-warning p-4 my-3 text-white rounded shadow" style="min-height: 160px;">
                   <h3>E - Learning</h3>
-                  <p>.</p>
+                  <p>Belajarlah Dengan Giat.</p>
                </div>
             </a>
          </div>

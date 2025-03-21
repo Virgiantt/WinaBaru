@@ -16,18 +16,17 @@ class MateriModel extends CI_Model
         return $this->db->get()->result();
     }
 
-    public function get_discuss_by_chapter($chapter_id)
+    public function get_materi_by_id($chapter_id)
     {
-        $this->db->select('*');
-        $this->db->from('discuss');
-        $this->db->where('chapter_id', $chapter_id);
-        $query = $this->db->get();
-
-        // Debugging
-        echo "QUERY: " . $this->db->last_query();
-        print_r($query->result());
-        exit;
-
-        return $query->result();
+        $this->db->select('
+        modul.name as modul_name, 
+        chapter.id as chapter_id, 
+        chapter.name as chapter_name, 
+        chapter.desc
+    ');
+        $this->db->from('chapter');
+        $this->db->join('modul', 'modul.id = chapter.modul_id', 'left');
+        $this->db->where('chapter.id', $chapter_id);
+        return $this->db->get()->row(); 
     }
 }

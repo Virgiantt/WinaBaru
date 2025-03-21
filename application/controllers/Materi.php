@@ -12,7 +12,7 @@ class Materi extends CI_Controller
 
     public function index()
     {
-        $this->load->view('user/materi/index'); // Tampilkan view pelatihan
+        $this->load->view('user/materi/index');
     }
 
     public function get_materi()
@@ -21,11 +21,9 @@ class Materi extends CI_Controller
         echo json_encode($data);
     }
 
-    public function get_discuss($chapter_id)
+    public function detail($chapter_id)
     {
-        $data = $this->db->get_where('discuss', ['chapter_id' => $chapter_id])->result();
-
-        // Kirim data dalam format JSON
-        echo json_encode($data);
+        $data['materi'] = $this->db->get_where('materi', ['id' => $chapter_id])->row();
+        $this->load->view('materi_detail', $data);
     }
 }
