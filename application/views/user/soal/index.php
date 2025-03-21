@@ -1,106 +1,86 @@
-<div class="container">
+<?php
+$this->load->view('template/header');
+$this->load->view('template/topbar');
 
-    <ol class="breadcrumb bg-light mt-3 mb-3">
-        <li class="breadcrumb-item"><a href="<?= base_url('user/dashboard') ?>">Home</a></li>
-        <li class="breadcrumb-item text-dark">Try Out</li>
-    </ol>
+// Ambil data soal dari database
+$query = $this->db->get('quiz');
+$questions = $query->result();
+?>
 
-    <h1 class="h3 text-gray-800">Kerjakan Try Out</h1>
-    <p>Uji kesiapanmu dengan Try Out kami, tantang dirimu untuk menjadi yang terbaik di antara yang lain!</p>
+<div class="container mt-4">
+    <h2 class="text-dark">Kerjakan Latihan</h2>
 
     <div class="row">
-        <div class="col-sm-12">
-        
-            <table class="table table-bordered  table-responsive-sm table-striped rounded" id="tableData">
-                <thead>
-                    <tr class="">
-                        <th>No</th>  
-                        <th>Judul</th> 
-                        <th>Waktu</th>
-                        <th>Jumlah Soal</th>
-                        <th>Opsi</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
+        <div class="col-md-8">
+            <?php foreach ($questions as $index => $question) : ?>
+                <div class="card p-3 mb-3">
+                    <h5 class="text-dark"><?= ($index + 1) . ". " . $question->question; ?></h5>
+
+
+                    <div class="answer-selection mt-3">
+                        <label>Pilih Jawaban:</label>
+                        <?php foreach (['A', 'B', 'C', 'D', 'E'] as $key => $label) : ?>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="jawaban_<?= $index; ?>" value="<?= $label; ?>">
+                                <label class="form-check-label"><?= $label; ?></label>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card p-3">
+                <h5 class="text-dark">Waktu Tersisa: <span id="timer">15m 1s</span></h5>
+                <div class="alert alert-danger">
+                    Mohon Tidak Refresh Halaman, ketika Refresh Halaman anda akan dianggap selesai mengerjakan.
+                </div>
+                <div class="d-flex justify-content-between mt-3">
+                    <button class="btn btn-danger">Batalkan</button>
+                    <button class="btn btn-success">Selesai</button>
+                </div>
+            </div>
         </div>
     </div>
-
 </div>
 
+<style>
+    .answer-options table {
+        width: 100%;
+    }
 
-<!-- Modal -->
-<div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="detailModalTitle" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" >Detail Try Out</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <form id="formDetail">
-            <div class="row">
+    .answer-options td {
+        padding: 10px;
+        text-align: left;
+    }
 
-                <div class="col-sm-12 form-group text-dark mb-0">
-                    <table class="table mb-0">
-                        <tr>
-                            <td width="20%">Judul</td>
-                            <td width="1%">:</td>
-                            <td align="left" class="title"></td>
-                        </tr>
-                    </table>
-                </div>
-                <div class="col-sm-12 form-group text-dark mb-0">
-                    <table class="table mb-0">
-                        <tr>
-                            <td width="20%">Waktu (menit)</td>
-                            <td width="1%">:</td>
-                            <td align="left" class="time"></td>
-                        </tr>
-                    </table>
-                </div>
-                <div class="col-sm-12 form-group text-dark mb-0">
-                    <table class="table mb-0">
-                        <tr>
-                            <td width="20%">Jumlah Soal</td>
-                            <td width="1%">:</td>
-                            <td align="left" class="question_count">110</td>
-                        </tr>
-                    </table>
-                </div>
-                <div class="col-sm-12 form-group text-dark mb-0">
-                    <table class="table mb-0">
-                        <tr>
-                            <td width="20%">Pembahasan</td>
-                            <td width="1%">:</td>
-                            <td align="left" class="description"></td>
-                        </tr>
-                    </table>
-                </div>
-                <div class="col-sm-12 form-group text-dark mb-0">
-                    <table class="table mb-0">
-                        <tr>
-                            <td width="20%">Passing Grade</td>
-                            <td width="1%">:</td>
-                            <td align="left" class="passing_grade">
-                                <div>Tes Wawasan Kebangsaan : <span class="twk"></span></div>
-                                <div>Tes Intelegensia Umum : <span class="tiu"></span></div>
-                                <div>Tes Karakteristik Pribadi : <span class="tkp"></span></div>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
+    .answer-options td:nth-child(3) {
+        width: 20%;
+        font-weight: bold;
+        color: green;
+    }
+</style>
 
-            </div>
-            <hr>
-            <div class="text-right">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                <button type="button" class="btn btn-primary mulai-soal">Mulai Try Out</button>
-            </div>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
+<script>
+    // Timer hitung mundur
+    let timeLeft = 901; // 15 menit 1 detik dalam detik
+    const timerElement = document.getElementById("timer");
+
+    function updateTimer() {
+        let minutes = Math.floor(timeLeft / 60);
+        let seconds = timeLeft % 60;
+        timerElement.textContent = `${minutes}m ${seconds}s`;
+
+        if (timeLeft > 0) {
+            timeLeft--;
+            setTimeout(updateTimer, 1000);
+        } else {
+            alert("Waktu habis! Jawaban akan dikumpulkan.");
+        }
+    }
+
+    updateTimer();
+</script>
+
+<?php $this->load->view('template/footer'); ?>

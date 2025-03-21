@@ -9,9 +9,10 @@ class Soal extends CI_Controller
         $this->load->model('SoalModel');
     }
 
-    public function index($chapter_id)
+    public function index()
     {
-        $data['soal'] = $this->SoalModel->getSoal($chapter_id);
-        $this->load->view('soal/index', $data);
+        $this->load->model('SoalModel');
+        $data['soal'] = $this->SoalModel->get_all_soal();
+        $this->load->view('user/soal/index', $data);
     }
 }

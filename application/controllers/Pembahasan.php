@@ -22,8 +22,8 @@ class Pembahasan extends CI_Controller
         }
 
         // Pastikan properti ada agar tidak error
-        if (!isset($data['materi']->chapter_name)) {
-            $data['materi']->chapter_name = 'Judul Tidak Tersedia';
+        if (!isset($data['materi']->name)) {
+            $data['materi']->name = 'Judul Tidak Tersedia';
         }
         if (!isset($data['materi']->desc)) {
             $data['materi']->desc = 'Deskripsi Tidak Tersedia';
