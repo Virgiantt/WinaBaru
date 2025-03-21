@@ -21,7 +21,6 @@ class Pembahasan extends CI_Controller
             return;
         }
 
-        // Pastikan properti ada agar tidak error
         if (!isset($data['materi']->name)) {
             $data['materi']->name = 'Judul Tidak Tersedia';
         }
