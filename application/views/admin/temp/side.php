@@ -65,8 +65,8 @@
             <li><a href="<?= base_url('admin/learnpelatihan'); ?>" class="nav-link"><i class="fa-solid fa-graduation-cap"></i> Pelatihan</a></li>
             <li><a href="<?= base_url('admin/learnmodul'); ?>" class="nav-link"><i class="fa-solid fa-file-alt"></i> Modul</a></li>
             <li><a href="<?= base_url('admin/learnmateri'); ?>" class="nav-link"><i class="fa-solid fa-book"></i> Materi</a></li>
-            <li><a href="<?= base_url('admin/learnpembahasan'); ?>" class="nav-link"><i class="fa-solid fa-comments"></i> Pembahasan</a></li>
-            <li><a href="<?= base_url('admin/learnsoal'); ?>" class="nav-link"><i class="fa-solid fa-clipboard-list"></i> Soal</a></li>
+            <li><a href="<?= base_url('admin/aksesmp'); ?>" class="nav-link"><i class="fa-solid fa-clipboard-list"></i> Akses Main Page</a></li>
+            <li><a href="<?= base_url('admin/cabang'); ?>" class="nav-link"><i class="fa-solid fa-comments"></i> Cabang & Akses</a></li>
         </ul>
     </li>
 

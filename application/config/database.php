@@ -1,5 +1,5 @@
 <?php
-defined('BASEPATH') or exit('No direct script access allowed');
+defined('BASEPATH') OR exit('No direct script access allowed');
 
 /*
 | -------------------------------------------------------------------
@@ -94,7 +94,7 @@ $db['default'] = array(
 	'failover' => array(),
 	'save_queries' => TRUE,
 	'options'   => array(
-		PDO::ATTR_TIMEOUT => 15, // Timeout 5 detik untuk PDO
-		MYSQLI_OPT_CONNECT_TIMEOUT => 15 // Timeout 5 detik untuk MySQLi
-	)
+        PDO::ATTR_TIMEOUT => 15, // Timeout 5 detik untuk PDO
+        MYSQLI_OPT_CONNECT_TIMEOUT => 15 // Timeout 5 detik untuk MySQLi
+    )
 );

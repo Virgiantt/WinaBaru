@@ -110,7 +110,7 @@
                if (result.isConfirmed) {
                   $.ajax({
                      url: '<?=base_url()?>admin/delete_lmodul',
-                     method: 'DELETE',
+                     method: 'POST',
                      data: { id: data.id },
                      success: function(response) {
                         table.ajax.reload();
