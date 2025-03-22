@@ -7,13 +7,12 @@
         <li class="breadcrumb-item"><a href="<?= base_url('Materi') ?>">Materi</a></li>
     </ol>
 
-    <h1 class="h3"><?= isset($materi->chapter_name) ? $materi->chapter_name : 'Judul Tidak Ditemukan' ?></h1>
+    <h1 class="h3"><?= isset($materi->name) ? $materi->name : 'Judul Tidak Ditemukan' ?></h1>
     <p><?= isset($materi->desc) ? $materi->desc : 'Deskripsi tidak tersedia' ?></p>
 
     <div class="card mb-3 border-0 shadow-sm">
         <div class="card-header bg-primary text-white d-flex justify-content-between">
             <strong><i class="fas fa-book"></i> Pembahasan</strong>
-            <span class="badge bg-success">Selesai: Lihat</span>
         </div>
         <div class="card-body" style="min-height: 350px;">
             <p>Berikut materi pembahasan yang dapat dipelajari secara mandiri.</p>
@@ -26,10 +25,6 @@
     <div class="card mb-3 border-0 shadow-sm">
         <div class="card-header bg-danger text-white d-flex justify-content-between">
             <strong><i class="fas fa-question-circle"></i> Soal Pre-Test</strong>
-            <div>
-                <span class="badge bg-success">Selesai: Lihat</span>
-                <span class="badge bg-success">Selesai: Memperoleh Nilai</span>
-            </div>
         </div>
         <div class="card-body" style="min-height: 350px;">
             <p>Sebelum mengerjakan, silakan perhatikan informasi berikut.</p>
@@ -59,43 +54,27 @@
                     if (data.length > 0) {
                         var content = '<div class="row">';
 
-                        data.forEach(function(item, index) {
+                        data.forEach(function(item) {
                             var youtubeId = getYoutubeId(item.link);
-                            var pembahasanKey = "pembahasan_" + index;
-
-                            var isUnlocked = index === 0 || localStorage.getItem("pembahasan_" + (index - 1));
-                            var disabledClass = isUnlocked ? "bg-white" : "bg-secondary text-light"; // Warna abu-abu jika terkunci
-                            var pointerEvents = isUnlocked ? "" : "pointer-events: none; opacity: 0.5;"; // Cegah klik
-
                             var thumbnail = youtubeId ? `
-                        <a href="${isUnlocked ? item.link : '#'}" target="_blank" class="d-block ${isUnlocked ? '' : 'disabled'}" 
-                            onclick="${isUnlocked ? `markAsViewed(${index})` : 'return false;'}" style="${pointerEvents}">
-                            <img src="https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg" class="card-img-top" style="height: 150px; object-fit: cover;">
-                        </a>` : '';
-
+                                <a href="${item.link}" target="_blank" class="d-block">
+                                    <img src="https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg" class="card-img-top" style="height: 150px; object-fit: cover;">
+                                </a>` : '';
                             var fileDownload = item.filepath ? `
-                        <a href="<?= base_url() ?>${item.filepath}" target="_blank" class="btn btn-sm btn-primary mt-2 ${isUnlocked ? '' : 'disabled'}" 
-                            onclick="${isUnlocked ? `markAsViewed(${index})` : 'return false;'}" style="${pointerEvents}">
-                            <i class="fas fa-download"></i> Download
-                        </a>` : '';
-
-                            var lockedMessage = !isUnlocked ? `<p class="text-warning mt-2"><i class="fas fa-lock"></i> Harus menyelesaikan Pembahasan ${index} dulu.</p>` : '';
+                                <a href="<?= base_url() ?>${item.filepath}" target="_blank" class="btn btn-sm btn-primary mt-2">
+                                    <i class="fas fa-download"></i> Download
+                                </a>` : '';
 
                             content += `<div class="col-md-4 mb-3">
-                        <div class="card shadow-sm ${disabledClass}" style="min-height: 300px; ${pointerEvents}">
-                            ${thumbnail}
-                            <div class="card-body d-flex flex-column">
-                                <h5 class="card-title">${item.name ?? 'Tidak ada nama'}</h5>
-                                <p class="card-text flex-grow-1">${item.desc ?? 'Tidak ada deskripsi'}</p>
-                                ${lockedMessage}
-                                ${fileDownload}
-                            </div>
-                        </div>
-                    </div>`;
-
-                            if ((index + 1) % 3 === 0) {
-                                content += '</div><div class="row">';
-                            }
+                                <div class="card shadow-sm bg-white" style="min-height: 300px;">
+                                    ${thumbnail}
+                                    <div class="card-body d-flex flex-column">
+                                        <h5 class="card-title">${item.name ?? 'Tidak ada nama'}</h5>
+                                        <p class="card-text flex-grow-1">${item.desc ?? 'Tidak ada deskripsi'}</p>
+                                        ${fileDownload}
+                                    </div>
+                                </div>
+                            </div>`;
                         });
 
                         content += '</div>';
@@ -106,21 +85,6 @@
                 }
             });
         }
-
-
-
-        // Fungsi untuk menandai pembahasan sudah dilihat
-        function markAsViewed(index) {
-            localStorage.setItem("pembahasan_" + index, true);
-            loadPembahasan(); // Reload untuk memperbarui tampilan
-        }
-
-        // Fungsi untuk mengambil ID YouTube dari URL
-        function getYoutubeId(url) {
-            var match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
-            return match ? match[1] : null;
-        }
-
 
         function loadSoal() {
             $.ajax({
@@ -137,12 +101,31 @@
                             <strong>${index + 1}. ${item.name}</strong>
                             <p class="mb-0">${item.desc}</p>
                         </div>
-                        <a href="<?= base_url('soal/index/') ?>${chapterId}" class="btn btn-primary btn-sm">
+                        <button class="btn btn-primary btn-sm kerjakan-btn" data-id="${item.id}" data-name="${item.name}">
                             <i class="fas fa-pencil-alt"></i> Kerjakan
-                        </a>
+                        </button>
                     </li>`;
                             list.append(listItem);
                         });
+
+                        // Tambahkan event listener setelah elemen tombol ditambahkan ke DOM
+                        $(".kerjakan-btn").click(function() {
+                            var discussId = $(this).data("id");
+                            var discussName = $(this).data("name");
+
+                            $.ajax({
+                                url: "<?= base_url('Soal/updateDiscussId') ?>",
+                                method: "POST",
+                                data: {
+                                    discuss_id: discussId,
+                                    name: discussName
+                                },
+                                success: function(response) {
+                                    window.location.href = "<?= base_url('soal/index/') ?>" + discussId;
+                                }
+                            });
+                        });
+
                     } else {
                         list.append('<li class="list-group-item text-center">Belum ada soal</li>');
                     }
@@ -150,6 +133,11 @@
             });
         }
 
+
+        function getYoutubeId(url) {
+            var match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.*\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+            return match ? match[1] : null;
+        }
 
         if (chapterId !== 'null') {
             loadPembahasan();
