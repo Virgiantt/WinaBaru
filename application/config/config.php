@@ -27,10 +27,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 if (isset($_SERVER['HTTP_HOST'])) {
     $host = $_SERVER['HTTP_HOST']; // Dapatkan nama host
     $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? "https://" : "http://"; // Cek apakah menggunakan https
-    $config['base_url'] = $protocol . $host . '/bu1'; // Atur base URL dinamis
+    $config['base_url'] = $protocol . $host . '/WinaBaru'; // Atur base URL dinamis
 } else {
     // Default jika tidak terdeteksi
-    $config['base_url'] = 'http://localhost/bu1/';
+    $config['base_url'] = 'http://localhost:8123/WinaBaru/';
 }
 
 /*

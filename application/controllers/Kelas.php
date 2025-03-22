@@ -18,7 +18,7 @@ class Kelas extends CI_Controller
             $this->session->set_userdata('user_id', 1); // Contoh, pastikan user_id diset
         }
 
-        $this->load->view('user/kelas');
+        $this->load->view('user/kelas/index');
     }
 
     public function get_kelas()
@@ -38,6 +38,7 @@ class Kelas extends CI_Controller
         if (empty($data)) {
             echo json_encode(['error' => 'Tidak ada kelas yang tersedia']);
             return;
+            redirect('Welcome');
         }
 
         echo json_encode(['user_id' => $user_id, 'data' => $data]);

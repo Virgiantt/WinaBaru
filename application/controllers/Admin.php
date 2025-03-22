@@ -12,7 +12,7 @@ class Admin extends CI_Controller {
    function index() {
       $this->dashboard();
    }
-// DASHBOARD
+// DASHBOARD UTAMA
 	public function dashboard()
 	{
 		$data['pages'] 	= 'Dashboard Admin';
@@ -711,170 +711,41 @@ class Admin extends CI_Controller {
       $this->db->insert('lc_access', $data);
       echo json_encode(array('status' => 'success', 'message' => 'Data modul berhasil ditambahkan'));
    }
-
-
-// KOYOK E GA PENTING
-// learnpembahasan
-	public function learnpembahasan()
-	{
-		$data['pages'] 	= 'Dashboard Pembasan Course';
+// AKSES MP
+   public function aksesmp() {
+		$data['pages'] 	= 'Akses Main Page';
 		$data['main_page'] 	= $this->m_model->get_list_menu();
 		$data['announcement'] 	= $this->db->get('announcement')->row();
 		$this->load->view('template/header');
 		$this->load->view('admin/temp/head');
 		$this->load->view('admin/temp/side');
-		$this->load->view('admin/dash',$data);
+		$this->load->view('admin/aksesmp',$data); // chapter as materi
 		$this->load->view('template/footer');
-	}
-   
-   public function fetch_lpembahasan($materi_id)
+   }
+   public function fetch_mpakses()
    {
-      $this->db->select('*');
-      $this->db->from('discuss');
-      $this->db->where('materi_id',$materi_id);
+      $this->db->select('mp_access.*');
+      $this->db->from('chapter');
+      $this->db->join('modul', 'modul.id = chapter.modul_id', 'left');
       $query = $this->db->get();
-      $data = array();
-      foreach ($query->result() as $kelas) {
-         $data[] = array(
-               'id'    => $kelas->id,
-               'name'  => $kelas->name,
-               'desc'  => $kelas->desc,
-               'link'  => $kelas->link,
-               'typelink'  => $kelas->typelink,
-               'filepath'  => $kelas->filepath,
-               'filename'  => $kelas->filename,
-               'materi_id'  => $kelas->materi_id
-         );
-      }
+      $data = $query->result_array();
+
+      $totalRecords = $this->db->count_all('chapter');
+      $this->db->select('COUNT(*) as total');
+      $this->db->from('chapter');
+      $this->db->join('modul', 'modul.id = chapter.modul_id', 'left');
+      $filteredRecords = $this->db->get()->row()->total;
+
       $response = array(
          'draw'            => intval($this->input->get('draw')),
-         'recordsTotal'    => $this->db->count_all('discuss'), 
-         'recordsFiltered' => $this->db->count_all_results('discuss'), 
+         'recordsTotal'    => $totalRecords, 
+         'recordsFiltered' => $filteredRecords, 
          'data'            => $data 
       );
-
-      // Kirimkan response dalam format JSON
       echo json_encode($response);
    }
-   public function add_lpembahasan()
-   {
-        $name = $this->input->post('name');
-        $desc = $this->input->post('desc');
-        $data = array(
-            'name' => $name,
-            'desc' => $desc
-        );
-        $this->db->insert('discuss', $data);
-        echo json_encode(array('status' => 'success', 'message' => 'Data kelas berhasil ditambahkan'));
-   }
-   public function edit_lpembahasan()
-   {
-        $id = $this->input->post('id');
-        $name = $this->input->post('name');
-        $desc = $this->input->post('desc');
-        $data = array(
-            'name' => $name,
-            'desc' => $desc
-        );
-        $this->db->where('id', $id);
-        if ($this->db->update('discuss', $data)) {
-         echo json_encode(array('status' => 'success', 'message' => 'Data kelas berhasil diperbarui'));
-        }else{
-         echo json_encode(array('status' => 'errorr', 'message' => 'Data kelas berhasil diperbarui'));
-        }
-   }
-   public function delete_lpembahasan()
-   {
-        $id = $this->input->post('id');
-        $this->db->where('id', $id);
-        $this->db->delete('discuss');
-        echo json_encode(array('status' => 'success', 'message' => 'Data kelas berhasil dihapus'));
-   }
-// learnsoal
-	public function learnsoal()
-	{
-		$data['pages'] 	= 'Dashboard Soal Course';
-		$data['main_page'] 	= $this->m_model->get_list_menu();
-		$data['announcement'] 	= $this->db->get('announcement')->row();
-		$this->load->view('template/header');
-		$this->load->view('admin/temp/head');
-		$this->load->view('admin/temp/side');
-		$this->load->view('admin/dash',$data);
-		$this->load->view('template/footer');
-	}
-   
-   public function fetch_lsoal($materi_id)
-   {
-      $this->db->select('*');
-      $this->db->from('quiz');
-      $this->db->where('materi_id',$materi_id);
-      $query = $this->db->get('');
-      $data = array();
-      foreach ($query->result() as $kelas) {
-         $data[] = array(
-               'id'    => $kelas->id,
-               'materi_id'  => $kelas->materi_id,
-               'question'  => $kelas->question,
-               'ans_1'  => $kelas->ans_1,
-               'ans_2'  => $kelas->ans_2,
-               'ans_3'  => $kelas->ans_3,
-               'ans_4'  => $kelas->ans_4,
-               'ans_5'  => $kelas->ans_5,
-               'val_1'  => $kelas->val_1,
-               'val_2'  => $kelas->val_2,
-               'val_3'  => $kelas->val_3,
-               'val_4'  => $kelas->val_4,
-               'val_5'  => $kelas->val_5,
-               'opt_1'  => $kelas->opt_1,
-               'opt_2'  => $kelas->opt_2,
-               'opt_3'  => $kelas->opt_3,
-               'opt_4'  => $kelas->opt_4,
-               'opt_5'  => $kelas->opt_5
-         );
-      }
-      $response = array(
-         'draw'            => intval($this->input->get('draw')),
-         'recordsTotal'    => $this->db->count_all('quiz'), 
-         'recordsFiltered' => $this->db->count_all_results('quiz'), 
-         'data'            => $data 
-      );
 
-      // Kirimkan response dalam format JSON
-      echo json_encode($response);
-   }
-   public function add_lsoal()
-   {
-        $name = $this->input->post('name');
-        $desc = $this->input->post('desc');
-        $data = array(
-            'name' => $name,
-            'desc' => $desc
-        );
-        $this->db->insert('quiz', $data);
-        echo json_encode(array('status' => 'success', 'message' => 'Data kelas berhasil ditambahkan'));
-   }
-   public function edit_lsoal()
-   {
-        $id = $this->input->post('id');
-        $name = $this->input->post('name');
-        $desc = $this->input->post('desc');
-        $data = array(
-            'name' => $name,
-            'desc' => $desc
-        );
-        $this->db->where('id', $id);
-        if ($this->db->update('quiz', $data)) {
-         echo json_encode(array('status' => 'success', 'message' => 'Data kelas berhasil diperbarui'));
-        }else{
-         echo json_encode(array('status' => 'errorr', 'message' => 'Data kelas berhasil diperbarui'));
-        }
-   }
-   public function delete_lsoal()
-   {
-        $id = $this->input->post('id');
-        $this->db->where('id', $id);
-        $this->db->delete('quiz');
-        echo json_encode(array('status' => 'success', 'message' => 'Data kelas berhasil dihapus'));
-   }
+
+
 
 }
