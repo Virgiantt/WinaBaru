@@ -4,12 +4,12 @@
       <hr>
       <div class="d-flex align-items-center gap-2">
          <div class="col-md-4">
-            <select class="form-select select2 select2lesson" id="idlesson" name="lesson" required></select>
+            <select class="form-select select2 select2user" id="iduser" name="user" required></select>
          </div>
          <div class="col-md-4">
             <select class="form-select select2 select2lesson" id="idlesson" name="lesson" required></select>
          </div>
-         <button id="addquiz" class="btn btn-success text-white"><i class="fa-solid fa-plus"></i>  Tambah</button>
+         <button id="add" class="btn btn-success text-white"><i class="fa-solid fa-plus"></i>  Tambah</button>
          <button id="del" class="btn btn-danger"><i class="fa-solid fa-trash-can"></i>  Hapus</button>
       </div>
 		<div class="card border-primary mt-3">
@@ -41,7 +41,7 @@
          processing: true,
          serverSide: true,
          ajax: {
-            url: '<?=base_url()?>admin/fetch_lkelas',
+            url: '<?=base_url()?>admin/fetch_mpakses',
             type: 'GET'
          },
          columns: [
@@ -54,12 +54,12 @@
          $(this).toggleClass('selected'); // Tambahkan atau hapus class selected saat baris diklik
       });
       // add user kelas akses
-      $('#adduserkelas').click(function() {
+      $('#add').click(function() {
          var idmodul = $('#iduser').val();
-         var lesson_id = $('#materi_iddet').val();
+         var lesson_id = $('#idlesson').val();
          $.ajax({
             type: "POST",
-            url: "<?= base_url('admin/add_user_kelas') ?>",
+            url: "<?= base_url('admin/add_jabatan_mp') ?>",
             data: {idmodul: idmodul, lesson_id: lesson_id},
             dataType: "json",
             success: function (response) {
@@ -69,7 +69,7 @@
                         title: 'Sukses',
                         text: response.message
                      }).then(() => {
-                        detaillesson(lesson_id);
+                        table.ajax.reload();
                      });
                } else {
                      Swal.fire({
@@ -102,12 +102,12 @@
             }).then((result) => {
                if (result.isConfirmed) {
                   $.ajax({
-                     url: '<?=base_url()?>admin/delete_lkelas',
+                     url: '<?=base_url()?>admin/delete_mpakses',
                      method: 'POST',
                      data: { id: data.id },
                      success: function(response) {
                         table.ajax.reload();
-                        Swal.fire('Terhapus!', 'Data kelas berhasil dihapus!', 'success');
+                        Swal.fire('Terhapus!', 'Data berhasil dihapus!', 'success');
                      },
                      error: function(error) {
                         Swal.fire('Gagal', 'Terjadi kesalahan saat menghapus data!', 'error');
@@ -119,14 +119,14 @@
             Swal.fire('Peringatan', 'Pilih data yang ingin dihapus terlebih dahulu!', 'warning');
          }
       });
+      userselect();
 
       function userselect(){
 			$(".select2user").select2({ 	
 				theme: "bootstrap-5",
-				dropdownParent: $("#modalDetail"),
 				placeholder: 'User....',
 			  	ajax: {
-			    	url: "<?= base_url()?>admin/userselect",
+			    	url: "<?= base_url()?>admin/jabatanselect",
 			    	dataType: 'json',
 			    	data: (params) => {
 			        return {
@@ -137,7 +137,7 @@
 			        	const results = data.items.map(item => {
 			        	return {
 			            id: item.id,
-			            text: item.name + " | " + item.username + " | " + item.email,
+			            text: item.name ,
 			          };
 			        });
 			        return {
@@ -148,10 +148,9 @@
 			});
 			$(".select2lesson").select2({ 	
 				theme: "bootstrap-5",
-				dropdownParent: $("#modalDetail"),
-				placeholder: 'Pelatihan....',
+				placeholder: 'Menu main page....',
 			  	ajax: {
-			    	url: "<?= base_url()?>admin/lessonselect",
+			    	url: "<?= base_url()?>admin/main_pageselect",
 			    	dataType: 'json',
 			    	data: (params) => {
 			        return {

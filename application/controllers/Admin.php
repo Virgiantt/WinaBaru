@@ -724,9 +724,11 @@ class Admin extends CI_Controller {
    }
    public function fetch_mpakses()
    {
-      $this->db->select('mp_access.*');
-      $this->db->from('chapter');
-      $this->db->join('modul', 'modul.id = chapter.modul_id', 'left');
+      $this->db->select('mp_access.*,jabatan.name name, main_page.name desc');
+      $this->db->from('mp_access');
+      $this->db->join('jabatan', 'jabatan.id = mp_access.jabatan_id', 'left');
+      $this->db->join('main_page', 'main_page.id = mp_access.mainpage_id', 'left');
+      $this->db->order_by('jabatan.name', 'ASC');
       $query = $this->db->get();
       $data = $query->result_array();
 
@@ -744,7 +746,102 @@ class Admin extends CI_Controller {
       );
       echo json_encode($response);
    }
+   function jabatanselect(){
+		$id=htmlspecialchars($this->input->get('id'));
+		if ($id == "") {
+	        if ($get = $this->db->get('jabatan')->result_array()) {
+		        	$data = array(
+		        	'res' => 'ada',
+		        	'items' => $get
+		        );
+	        }else{
+	        	$data = array(
+	        	'res' => 'tidak ada',
+	        	'post' => 'eror'
+	        	);
+	        }
+	    }else{
+         $this->db->select('*');
+         $this->db->like('name',$id);
+	    	if ($get = $this->db->get('jabatan')->result_array()) {
+		        	$data = array(
+		        	'res' => 'ada',
+		        	'items' => $get
+		        );
+	        }else{
+	        	$data = array(
+	        	'res' => 'tidak ada',
+	        	'post' => 'eror'
+	        	);
+	        }
+	    }
+        echo json_encode($data);
+	}
+   function main_pageselect(){
+		$id=htmlspecialchars($this->input->get('id'));
+		if ($id == "") {
+	        if ($get = $this->db->get('main_page')->result_array()) {
+		        	$data = array(
+		        	'res' => 'ada',
+		        	'items' => $get
+		        );
+	        }else{
+	        	$data = array(
+	        	'res' => 'tidak ada',
+	        	'post' => 'eror'
+	        	);
+	        }
+	    }else{
+         $this->db->select('*');
+         $this->db->like('name',$id);
+	    	if ($get = $this->db->get('main_page')->result_array()) {
+		        	$data = array(
+		        	'res' => 'ada',
+		        	'items' => $get
+		        );
+	        }else{
+	        	$data = array(
+	        	'res' => 'tidak ada',
+	        	'post' => 'eror'
+	        	);
+	        }
+	    }
+        echo json_encode($data);
+	}
+   
+   public function add_jabatan_mp()
+   {
+      $modul_id = $this->input->post('idmodul');
+      $lesson_id = $this->input->post('lesson_id');
 
+      // Cek apakah kombinasi modul_id dan lesson_id sudah ada
+      $exists = $this->db->get_where('mp_access', [
+         'jabatan_id' => $modul_id,
+         'mainpage_id' => $lesson_id
+      ])->row();
+
+      if ($exists) {
+         echo json_encode(array('status' => 'error', 'message' => 'Kombinasi modul sudah ada!'));
+         return;
+      }
+
+      // Jika belum ada, insert data baru
+      $data = array(
+         'jabatan_id' => $modul_id,
+         'mainpage_id' => $lesson_id
+      );
+
+      $this->db->insert('mp_access', $data);
+      echo json_encode(array('status' => 'success', 'message' => 'Data berhasil ditambahkan'));
+   }
+   
+   public function delete_mpakses()
+   {
+        $id = $this->input->post('id');
+        $this->db->where('id', $id);
+        $this->db->delete('mp_access');
+        echo json_encode(array('status' => 'success', 'message' => 'Data akses berhasil dihapus'));
+   }
 
 
 
